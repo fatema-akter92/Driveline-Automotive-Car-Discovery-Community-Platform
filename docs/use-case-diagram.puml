@@ -1,0 +1,209 @@
+@startuml
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F7FBFF
+  BorderColor #1B4D7A
+}
+
+actor Guest
+actor "Registered User" as User
+actor Admin
+actor "MySQL Database" as DB
+actor "Session Engine" as Session
+actor "File Storage" as FS
+
+Admin --|> User
+
+rectangle "Driveline Web Application" {
+
+  package "Authentication" {
+    usecase "Access Landing" as UC_Landing
+    usecase "Register Account" as UC_Register
+    usecase "Check Email Uniqueness" as UC_CheckEmail
+    usecase "Create User Account" as UC_CreateUser
+    usecase "Login" as UC_Login
+    usecase "Validate Credentials" as UC_ValidateCreds
+    usecase "Create Session" as UC_CreateSession
+    usecase "Logout" as UC_Logout
+  }
+
+  package "Access Control" {
+    usecase "Access Protected Page" as UC_AccessProtected
+    usecase "Verify Session" as UC_VerifySession
+    usecase "Check Timeout" as UC_CheckTimeout
+    usecase "Refresh Activity" as UC_RefreshActivity
+    usecase "Redirect To Login" as UC_RedirectLogin
+  }
+
+  package "Home & Discovery" {
+    usecase "View Homepage" as UC_Home
+    usecase "Get Featured Car" as UC_FeaturedCar
+    usecase "Get Suggested Cars" as UC_SuggestedCars
+    usecase "Get Car Average Rating" as UC_AvgRating
+    usecase "Open Car Details" as UC_OpenCar
+  }
+
+  package "Search" {
+    usecase "Search Cars" as UC_SearchCars
+    usecase "Apply Filters" as UC_ApplyFilters
+    usecase "View Search Results" as UC_ViewResults
+  }
+
+  package "Car Details & Reviews" {
+    usecase "View Car Details + Images" as UC_ViewCarDetails
+    usecase "View Reviews" as UC_ViewReviews
+    usecase "Write Review" as UC_WriteReview
+    usecase "Prevent Duplicate Review" as UC_PreventDuplicate
+    usecase "Edit Own Review" as UC_EditReview
+    usecase "Delete Own Review" as UC_DeleteReview
+    usecase "Like Review" as UC_LikeReview
+    usecase "Unlike Review" as UC_UnlikeReview
+    usecase "Load Like State + Counts" as UC_LoadLikeState
+  }
+
+  package "Community" {
+    usecase "View Community Feed" as UC_ViewFeed
+    usecase "Create Post" as UC_CreatePost
+    usecase "Edit Own Post" as UC_EditPost
+    usecase "Delete Own Post" as UC_DeleteOwnPost
+    usecase "Delete Any Post" as UC_DeleteAnyPost
+    usecase "Like/Dislike Post" as UC_ReactPost
+    usecase "Comment On Post" as UC_CommentPost
+    usecase "Fetch Posts + User Reaction" as UC_FetchPosts
+    usecase "Fetch Comments" as UC_FetchComments
+  }
+
+  package "Profile" {
+    usecase "View Profile" as UC_ViewProfile
+    usecase "Edit Profile" as UC_EditProfile
+    usecase "Validate DIU Email Format" as UC_ValidateEmailRule
+    usecase "Upload Profile Picture" as UC_UploadProfilePic
+    usecase "Save Profile" as UC_SaveProfile
+  }
+
+  package "Admin Car Management" {
+    usecase "Access Add Car Page" as UC_AccessAddCar
+    usecase "Add Car" as UC_AddCar
+    usecase "Add Car Images" as UC_AddCarImages
+    usecase "Validate Add-Car Form" as UC_ValidateAddCar
+  }
+}
+
+' Human actor associations
+Guest --> UC_Landing
+Guest --> UC_Register
+Guest --> UC_Login
+
+User --> UC_Logout
+User --> UC_AccessProtected
+User --> UC_Home
+User --> UC_OpenCar
+User --> UC_SearchCars
+User --> UC_ViewFeed
+User --> UC_WriteReview
+User --> UC_EditReview
+User --> UC_DeleteReview
+User --> UC_LikeReview
+User --> UC_UnlikeReview
+User --> UC_CreatePost
+User --> UC_EditPost
+User --> UC_DeleteOwnPost
+User --> UC_ReactPost
+User --> UC_CommentPost
+User --> UC_ViewProfile
+User --> UC_EditProfile
+
+Admin --> UC_AccessAddCar
+Admin --> UC_AddCar
+Admin --> UC_AddCarImages
+Admin --> UC_DeleteAnyPost
+
+' Include relationships
+UC_Register ..> UC_CheckEmail : <<include>>
+UC_Register ..> UC_CreateUser : <<include>>
+UC_Login ..> UC_ValidateCreds : <<include>>
+UC_Login ..> UC_CreateSession : <<include>>
+
+UC_AccessProtected ..> UC_VerifySession : <<include>>
+UC_AccessProtected ..> UC_CheckTimeout : <<include>>
+UC_AccessProtected ..> UC_RefreshActivity : <<include>>
+
+UC_Home ..> UC_FeaturedCar : <<include>>
+UC_Home ..> UC_SuggestedCars : <<include>>
+UC_Home ..> UC_AvgRating : <<include>>
+UC_OpenCar ..> UC_ViewCarDetails : <<include>>
+UC_OpenCar ..> UC_ViewReviews : <<include>>
+
+UC_SearchCars ..> UC_ApplyFilters : <<include>>
+UC_SearchCars ..> UC_ViewResults : <<include>>
+UC_ViewResults ..> UC_AvgRating : <<include>>
+
+UC_WriteReview ..> UC_PreventDuplicate : <<include>>
+UC_ViewReviews ..> UC_LoadLikeState : <<include>>
+
+UC_ViewFeed ..> UC_FetchPosts : <<include>>
+UC_ViewFeed ..> UC_FetchComments : <<include>>
+
+UC_EditProfile ..> UC_ValidateEmailRule : <<include>>
+UC_EditProfile ..> UC_SaveProfile : <<include>>
+
+UC_AddCar ..> UC_ValidateAddCar : <<include>>
+
+' Extend relationships
+UC_RedirectLogin ..> UC_AccessProtected : <<extend>>
+UC_EditReview ..> UC_ViewReviews : <<extend>>
+UC_DeleteReview ..> UC_ViewReviews : <<extend>>
+UC_LikeReview ..> UC_ViewReviews : <<extend>>
+UC_UnlikeReview ..> UC_ViewReviews : <<extend>>
+
+UC_EditPost ..> UC_ViewFeed : <<extend>>
+UC_DeleteOwnPost ..> UC_ViewFeed : <<extend>>
+UC_DeleteAnyPost ..> UC_ViewFeed : <<extend>>
+UC_ReactPost ..> UC_ViewFeed : <<extend>>
+UC_CommentPost ..> UC_ViewFeed : <<extend>>
+
+UC_UploadProfilePic ..> UC_EditProfile : <<extend>>
+UC_AddCarImages ..> UC_AddCar : <<extend>>
+
+' External system associations
+DB --> UC_CheckEmail
+DB --> UC_CreateUser
+DB --> UC_ValidateCreds
+DB --> UC_FeaturedCar
+DB --> UC_SuggestedCars
+DB --> UC_AvgRating
+DB --> UC_ViewCarDetails
+DB --> UC_ViewReviews
+DB --> UC_WriteReview
+DB --> UC_EditReview
+DB --> UC_DeleteReview
+DB --> UC_LikeReview
+DB --> UC_UnlikeReview
+DB --> UC_LoadLikeState
+DB --> UC_SearchCars
+DB --> UC_ViewResults
+DB --> UC_FetchPosts
+DB --> UC_FetchComments
+DB --> UC_CreatePost
+DB --> UC_EditPost
+DB --> UC_DeleteOwnPost
+DB --> UC_DeleteAnyPost
+DB --> UC_ReactPost
+DB --> UC_CommentPost
+DB --> UC_ViewProfile
+DB --> UC_SaveProfile
+DB --> UC_AddCar
+DB --> UC_AddCarImages
+
+Session --> UC_CreateSession
+Session --> UC_VerifySession
+Session --> UC_CheckTimeout
+Session --> UC_RefreshActivity
+Session --> UC_Logout
+
+FS --> UC_UploadProfilePic
+
+@enduml

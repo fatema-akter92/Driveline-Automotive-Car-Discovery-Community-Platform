@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Driveline Class Diagram</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+
+<body style="font-family:Arial; text-align:center; background:#f4f6f8;">
+<h2>Driveline - Detailed Class Diagram</h2>
+<img id="diagram" style="width:100%; max-width:1400px;">
+
+<script>
+const code = `
+@startuml
+left to right direction
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+skinparam class {
+  BackgroundColor #F7FBFF
+  BorderColor #1B4D7A
+}
+
+title Driveline System Class Diagram
+
+package "Domain" {
+
+class User {
++uId: int
++uName: string
++uEmail: string
++uType: UserType
++uPoints: int
++uProfilePic: string
++uAbout: string
++uOwnedCar: string
++passwordHash: string
++isAdmin(): bool
++addPoints(int): void
++updateProfile(...): void
+}
+
+class AdminUser {
++adminLevel: int
++canDeleteAnyPost(): bool
++canAddCar(): bool
+}
+
+class Car {
++cId: int
++cName: string
++cBrand: string
++cModel: string
++cEngine: string
++updateDetails(): void
+}
+
+class Review {
++rId: int
++uId: int
++cId: int
++rStar: int
++update(...): void
+}
+
+class Post {
++postId: int
++uId: int
++topic: string
++content: text
++edit(...): void
+}
+
+class Comment {
++commentId: int
++postId: int
++uId: int
++commentText: text
+}
+
+class PostReaction {
++postReactionId: int
++reaction: ReactionType
+}
+
+class ReviewLike {
++reviewLikeId: int
+}
+
+class SessionState {
++sessionId: string
++userId: int
++isExpired(): bool
+}
+
+class CarImage {
++imgId: int
++imgUrl: string
+}
+
+class CarRatingSummary {
++avgRating: decimal
+}
+
+class SearchCriteria {
++brand: string
++isEmpty(): bool
+}
+
+}
+
+package "Controllers" {
+
+class AuthController
+class RegisterController
+class LogoutController
+class SessionGuardController
+class HomeController
+class SearchController
+class CarController
+class CommunityController
+class ProfileController
+class AdminCarController
+class ReviewUpdateController
+
+}
+
+package "Services" {
+
+class AuthService
+class RegistrationService
+class SessionService
+class HomeService
+class SearchService
+class CarService
+class ReviewService
+class CommunityService
+class ProfileService
+class ImageStorageService
+
+}
+
+package "Repositories" {
+
+class UserRepository
+class CarRepository
+class ReviewRepository
+class CommunityRepository
+class SessionRepository
+class DatabaseConnection
+class FileStorageGateway
+
+}
+
+' ================= Relationships =================
+
+AdminUser --|> User
+
+User "1" -- "0..*" SessionState
+User "1" -- "0..*" Review
+Car "1" -- "0..*" Review
+Car "1" *-- "1..*" CarImage
+Car "1" -- "0..1" CarRatingSummary
+
+Review "1" -- "0..*" ReviewLike
+User "1" -- "0..*" ReviewLike
+
+User "1" -- "0..*" Post
+Post "1" -- "0..*" Comment
+User "1" -- "0..*" Comment
+
+Post "1" -- "0..*" PostReaction
+User "1" -- "0..*" PostReaction
+
+SearchCriteria ..> Car
+
+' Controllers → Services
+AuthController ..> AuthService
+RegisterController ..> RegistrationService
+LogoutController ..> SessionService
+SessionGuardController ..> SessionService
+
+HomeController ..> HomeService
+SearchController ..> SearchService
+CarController ..> CarService
+CarController ..> ReviewService
+CommunityController ..> CommunityService
+ProfileController ..> ProfileService
+ProfileController ..> ImageStorageService
+AdminCarController ..> CarService
+ReviewUpdateController ..> ReviewService
+
+' Services → Repositories
+AuthService ..> UserRepository
+RegistrationService ..> UserRepository
+SessionService ..> SessionRepository
+HomeService ..> CarRepository
+SearchService ..> CarRepository
+CarService ..> CarRepository
+ReviewService ..> ReviewRepository
+CommunityService ..> CommunityRepository
+ProfileService ..> UserRepository
+ImageStorageService ..> FileStorageGateway
+
+' Repositories → DB
+UserRepository ..> DatabaseConnection
+CarRepository ..> DatabaseConnection
+ReviewRepository ..> DatabaseConnection
+CommunityRepository ..> DatabaseConnection
+
+@enduml
+`;
+
+const encoded = plantumlEncoder.encode(code);
+document.getElementById("diagram").src =
+  "https://www.plantuml.com/plantuml/svg/" + encoded;
+</script>
+
+</body>
+</html>

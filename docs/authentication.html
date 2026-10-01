@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Authentication Use Case Diagram</title>
+  <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center; font-family:Arial;">
+
+<h2>Authentication Use Case Diagram</h2>
+<img id="diagram">
+
+<script>
+const code = `
+@startuml
+left to right direction
+
+actor Guest
+actor "MySQL Database Server" as DB
+actor "PHP Session Engine" as Session
+
+rectangle "Driveline Web Application" {
+  (Access Landing)
+  (Navigate to Login/Register)
+  (Submit Login)
+  (Validate Credentials)
+  (Create Session)
+  (Submit Registration)
+  (Check Email Uniqueness)
+  (Create Account)
+
+  Guest --> (Access Landing)
+  (Access Landing) ..> (Navigate to Login/Register) : <<extend>>
+
+  Guest --> (Submit Login)
+  (Submit Login) ..> (Validate Credentials) : <<include>>
+  (Submit Login) ..> (Create Session) : <<include>>
+
+  Guest --> (Submit Registration)
+  (Submit Registration) ..> (Check Email Uniqueness) : <<include>>
+  (Submit Registration) ..> (Create Account) : <<include>>
+
+  (Validate Credentials) --> DB
+  (Check Email Uniqueness) --> DB
+  (Create Account) --> DB
+  (Create Session) --> Session
+}
+@enduml
+`;
+
+const encoded = plantumlEncoder.encode(code);
+document.getElementById("diagram").src =
+  "https://www.plantuml.com/plantuml/svg/" + encoded;
+</script>
+
+</body>
+</html>

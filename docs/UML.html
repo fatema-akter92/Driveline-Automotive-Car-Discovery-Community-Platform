@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Driveline UML Diagram</title>
+
+  <!-- PlantUML Renderer -->
+  <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    h2 {
+      text-align: center;
+      margin: 12px 0;
+    }
+
+    .uml-wrap {
+      text-align: center;
+      width: 100%;
+      overflow: auto;
+      padding-bottom: 12px;
+    }
+
+    #umlImage {
+      width: 100%;
+      max-width: 190mm;
+      height: auto;
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm;
+      }
+
+      body {
+        width: 194mm;
+        margin: 0 auto;
+      }
+
+      #umlImage {
+        width: 190mm;
+        max-width: 190mm;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Driveline UML Class Diagram</h2>
+
+  <div class="uml-wrap">
+    <img id="umlImage" />
+  </div>
+
+  <script>
+    const uml = `
+@startuml
+top to bottom direction
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam defaultFontName Arial
+skinparam defaultFontSize 16
+skinparam titleFontSize 22
+skinparam classFontSize 16
+skinparam classAttributeFontSize 15
+skinparam classMethodFontSize 15
+skinparam class {
+  BackgroundColor #F7FBFF
+  BorderColor #1B4D7A
+}
+
+title Driveline - Detailed Class Diagram
+
+package "Domain Entities" {
+
+  enum UserType {
+    enthusiast
+    owner
+    buyer
+    admin
+  }
+
+  enum ReactionType {
+    like
+    dislike
+  }
+
+  class User {
+    +uId: int
+    +uName: string
+    +uEmail: string
+    +uType: UserType
+    +uPoints: int
+    +uProfilePic: string
+    +uAbout: string
+    +uOwnedCar: string
+    +passwordHash: string
+    +isAdmin(): bool
+    +addPoints(points: int): void
+    +updateProfile(name: string, email: string, about: string, profilePic: string): void
+    +changePassword(newHash: string): void
+    +canEditPost(postOwnerId: int): bool
+    +canDeletePost(postOwnerId: int): bool
+  }
+
+  class AdminUser {
+    +adminLevel: int
+    +canDeleteAnyPost(): bool
+    +canAddCar(): bool
+  }
+
+  class SessionState {
+    +sessionId: string
+    +userId: int
+    +token: string
+    +lastActivityAt: datetime
+    +expiresAt: datetime
+    +isExpired(now: datetime): bool
+    +refreshActivity(now: datetime): void
+    +touch(now: datetime): void
+    +remainingSeconds(now: datetime): int
+  }
+
+  class Car {
+    +cId: int
+    +cName: string
+    +cType: string
+    +cModel: string
+    +cBrand: string
+    +cEngine: string
+    +cReleaseDate: date
+    +cCountry: string
+    +cFeatures: text
+    +cInterestingFacts: text
+    +cDescription: text
+    +updateDetails(): void
+    +matches(criteria: SearchCriteria): bool
+    +releaseYear(): int
+  }
+
+  class CarImage {
+    +imgId: int
+    +carId: int
+    +imgUrl: string
+    +isValidUrl(): bool
+  }
+
+  class CarRatingSummary {
+    +carId: int
+    +avgRating: decimal
+    +totalReviews: int
+    +formatted(): string
+    +recalculate(stars: list<int>): void
+    +hasReviews(): bool
+  }
+
+  class SearchCriteria {
+    +brand: string
+    +engine: string
+    +yearStart: int
+    +yearEnd: int
+    +country: string
+    +keyword: string
+    +isEmpty(): bool
+    +normalize(): void
+    +hasYearRange(): bool
+  }
+
+  class Review {
+    +rId: int
+    +uId: int
+    +cId: int
+    +rStar: int
+    +rTopic: string
+    +rDescription: text
+    +createdAt: datetime
+    +updatedAt: datetime
+    +validateStarRange(): bool
+    +update(star: int, topic: string, description: string): void
+    +isOwnedBy(userId: int): bool
+    +canBeEditedBy(userId: int): bool
+  }
+
+  class ReviewLike {
+    +reviewLikeId: int
+    +rId: int
+    +uId: int
+    +createdAt: datetime
+    +belongsTo(userId: int): bool
+    +isForReview(reviewId: int): bool
+  }
+
+  class Post {
+    +postId: int
+    +uId: int
+    +topic: string
+    +content: text
+    +createdAt: datetime
+    +updatedAt: datetime
+    +edit(topic: string, content: string): void
+    +isOwnedBy(userId: int): bool
+    +canBeDeletedBy(userId: int, isAdmin: bool): bool
+  }
+
+  class PostReaction {
+    +postReactionId: int
+    +postId: int
+    +uId: int
+    +reaction: ReactionType
+    +createdAt: datetime
+    +toggle(reaction: ReactionType): void
+    +isLike(): bool
+    +switchTo(reaction: ReactionType): void
+  }
+
+  class Comment {
+    +commentId: int
+    +postId: int
+    +uId: int
+    +commentText: text
+    +createdAt: datetime
+    +preview(maxLen: int): string
+    +isOwnedBy(userId: int): bool
+    +isEmpty(): bool
+  }
+}
+
+AdminUser --|> User
+
+User "1" -- "0..*" SessionState
+User "1" -- "0..*" Review
+Car "1" -- "0..*" Review
+Car "1" *-- "1..*" CarImage
+Car "1" -- "0..1" CarRatingSummary
+
+Review "1" -- "0..*" ReviewLike
+User "1" -- "0..*" ReviewLike
+
+User "1" -- "0..*" Post
+Post "1" -- "0..*" Comment
+User "1" -- "0..*" Comment
+
+Post "1" -- "0..*" PostReaction
+User "1" -- "0..*" PostReaction
+
+SearchCriteria ..> Car
+
+@enduml
+`;
+
+    const encoded = plantumlEncoder.encode(uml);
+    document.getElementById("umlImage").src =
+      "https://www.plantuml.com/plantuml/svg/" + encoded;
+  </script>
+
+</body>
+</html>

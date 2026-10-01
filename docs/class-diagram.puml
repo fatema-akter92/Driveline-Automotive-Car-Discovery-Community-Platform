@@ -1,0 +1,507 @@
+@startuml
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #F7FBFF
+  BorderColor #1B4D7A
+}
+
+title Driveline - Detailed Class Diagram (Domain + Application + Persistence)
+
+package "Domain Entities" {
+
+  enum UserType {
+    enthusiast
+    owner
+    buyer
+    admin
+  }
+
+  enum ReactionType {
+    like
+    dislike
+  }
+
+  class User {
+    +uId: int
+    +uName: string
+    +uEmail: string
+    +uType: UserType
+    +uPoints: int
+    +uProfilePic: string
+    +uAbout: string
+    +uOwnedCar: string
+    +passwordHash: string
+    +isAdmin(): bool
+    +addPoints(points: int): void
+    +updateProfile(name: string, email: string, about: string, profilePic: string): void
+  }
+
+  class AdminUser {
+    +adminLevel: int
+    +canDeleteAnyPost(): bool
+    +canAddCar(): bool
+  }
+
+  class SessionState {
+    +sessionId: string
+    +userId: int
+    +token: string
+    +lastActivityAt: datetime
+    +expiresAt: datetime
+    +isExpired(now: datetime): bool
+    +refreshActivity(now: datetime): void
+  }
+
+  class Car {
+    +cId: int
+    +cName: string
+    +cType: string
+    +cModel: string
+    +cBrand: string
+    +cEngine: string
+    +cReleaseDate: date
+    +cCountry: string
+    +cFeatures: text
+    +cInterestingFacts: text
+    +cDescription: text
+    +updateDetails(): void
+  }
+
+  class CarImage {
+    +imgId: int
+    +carId: int
+    +imgUrl: string
+    +isValidUrl(): bool
+  }
+
+  class CarRatingSummary {
+    +carId: int
+    +avgRating: decimal
+    +totalReviews: int
+    +formatted(): string
+  }
+
+  class SearchCriteria {
+    +brand: string
+    +engine: string
+    +yearStart: int
+    +yearEnd: int
+    +country: string
+    +keyword: string
+    +isEmpty(): bool
+  }
+
+  class Review {
+    +rId: int
+    +uId: int
+    +cId: int
+    +rStar: int
+    +rTopic: string
+    +rDescription: text
+    +createdAt: datetime
+    +updatedAt: datetime
+    +validateStarRange(): bool
+    +update(star: int, topic: string, description: string): void
+  }
+
+  class ReviewLike {
+    +reviewLikeId: int
+    +rId: int
+    +uId: int
+    +createdAt: datetime
+    +belongsTo(userId: int): bool
+  }
+
+  class Post {
+    +postId: int
+    +uId: int
+    +topic: string
+    +content: text
+    +createdAt: datetime
+    +updatedAt: datetime
+    +edit(topic: string, content: string): void
+  }
+
+  class PostReaction {
+    +postReactionId: int
+    +postId: int
+    +uId: int
+    +reaction: ReactionType
+    +createdAt: datetime
+    +toggle(reaction: ReactionType): void
+  }
+
+  class Comment {
+    +commentId: int
+    +postId: int
+    +uId: int
+    +commentText: text
+    +createdAt: datetime
+    +preview(maxLen: int): string
+  }
+}
+
+package "Application Controllers" {
+
+  class AuthController {
+    +authService: AuthService
+    +sessionService: SessionService
+    +login(email: string, password: string): array
+  }
+
+  class RegisterController {
+    +registrationService: RegistrationService
+    +register(fullName: string, email: string, password: string, userType: string, profilePic: string, about: string, ownedCar: string): array
+  }
+
+  class LogoutController {
+    +sessionService: SessionService
+    +logout(): string
+  }
+
+  class SessionGuardController {
+    +sessionService: SessionService
+    +excludedPages: list<string>
+    +guard(currentPage: string): void
+    +redirectToLogin(): void
+  }
+
+  class HomeController {
+    +homeService: HomeService
+    +viewHomepage(userId: int): array
+  }
+
+  class SearchController {
+    +searchService: SearchService
+    +search(criteria: SearchCriteria): array
+  }
+
+  class CarController {
+    +carService: CarService
+    +reviewService: ReviewService
+    +viewCar(carId: int, userId: int): array
+    +handleReviewAction(action: string, payload: array): string
+  }
+
+  class CommunityController {
+    +communityService: CommunityService
+    +viewCommunity(userId: int): array
+    +handlePostAction(action: string, payload: array): string
+    +handleReaction(postId: int, userId: int, reaction: ReactionType): string
+    +addComment(postId: int, userId: int, text: string): string
+  }
+
+  class ProfileController {
+    +profileService: ProfileService
+    +imageStorageService: ImageStorageService
+    +viewProfile(userId: int): array
+    +updateProfile(userId: int, data: array, uploadedFileMeta: array): array
+  }
+
+  class AdminCarController {
+    +carService: CarService
+    +addCarWithImages(car: Car, imageUrls: list<string>): array
+  }
+
+  class ReviewUpdateController {
+    +reviewService: ReviewService
+    +updateReview(reviewId: int, carId: int, userId: int, stars: int, topic: string, description: string): string
+  }
+}
+
+package "Application Services" {
+
+  class AuthService {
+    +userRepository: UserRepository
+    +authenticate(email: string, password: string): User
+    +generateToken(length: int = 16): string
+  }
+
+  class RegistrationService {
+    +userRepository: UserRepository
+    +defaultPoints: int
+    +registerUser(fullName: string, email: string, password: string, userType: string, profilePic: string, about: string, ownedCar: string): User
+    +hashPassword(password: string): string
+  }
+
+  class SessionService {
+    +sessionRepository: SessionRepository
+    +idleTimeoutSeconds: int
+    +startSession(user: User, token: string): SessionState
+    +validateSessionOrFail(session: SessionState): void
+    +enforceTimeout(session: SessionState, idleSeconds: int = 3600): bool
+    +refreshSessionActivity(session: SessionState): void
+    +destroySession(): void
+  }
+
+  class HomeService {
+    +carRepository: CarRepository
+    +userRepository: UserRepository
+    +getHomepageData(userId: int): array
+  }
+
+  class SearchService {
+    +carRepository: CarRepository
+    +searchCars(criteria: SearchCriteria): list<Car>
+  }
+
+  class CarService {
+    +carRepository: CarRepository
+    +getCarDetailsWithImages(carId: int): Car
+    +getCarRating(carId: int): CarRatingSummary
+    +getFeaturedCar(): Car
+    +getSuggestedCars(excludedCarId: int, limit: int = 4): list<Car>
+    +addCar(car: Car): int
+    +addCarImage(carId: int, imageUrl: string): void
+  }
+
+  class ReviewService {
+    +reviewRepository: ReviewRepository
+    +listReviews(carId: int): list<Review>
+    +createReview(userId: int, carId: int, stars: int, topic: string, description: string): void
+    +editReview(reviewId: int, userId: int, stars: int, topic: string, description: string): void
+    +deleteReview(reviewId: int, userId: int): void
+    +hasUserReviewedCar(userId: int, carId: int): bool
+    +addLike(reviewId: int, userId: int): void
+    +removeLike(reviewId: int, userId: int): void
+    +getLikeCounts(reviewIds: list<int>): map<int,int>
+    +getUserLikedReviewSet(userId: int, reviewIds: list<int>): set<int>
+  }
+
+  class CommunityService {
+    +communityRepository: CommunityRepository
+    +createPost(userId: int, topic: string, content: string): void
+    +editPost(postId: int, userId: int, topic: string, content: string): void
+    +deletePost(postId: int, userId: int, isAdmin: bool): void
+    +togglePostReaction(postId: int, userId: int, reaction: ReactionType): void
+    +addComment(postId: int, userId: int, commentText: string): void
+    +getCommunityFeed(userId: int): list<Post>
+    +getCommentsByPostIds(postIds: list<int>): map<int,list<Comment>>
+  }
+
+  class ProfileService {
+    +userRepository: UserRepository
+    +acceptedEmailDomain: string
+    +getProfileBySessionUser(userId: int): User
+    +updateProfile(userId: int, name: string, email: string, about: string, profilePic: string): void
+    +validateDiuEmail(email: string): bool
+  }
+
+  class ImageStorageService {
+    +fileStorageGateway: FileStorageGateway
+    +baseUploadPath: string
+    +saveProfileUpload(fileMeta: array): string
+    +ensureUploadDirectory(path: string): void
+  }
+}
+
+package "Persistence & Infrastructure" {
+
+  class DatabaseConnection {
+    +host: string
+    +port: int
+    +dbName: string
+    +username: string
+    +password: string
+    +connect(): PDO
+  }
+
+  class UserRepository {
+    +pdo: PDO
+    +findByEmail(email: string): User
+    +emailExists(email: string): bool
+    +insertUser(user: User): int
+    +isUserAdmin(userId: int): bool
+    +getUserProfileBySession(userId: int): User
+    +updateUserProfile(user: User): void
+  }
+
+  class CarRepository {
+    +pdo: PDO
+    +getThumbnail(): Car
+    +getFourOtherCars(excludedCarId: int): list<Car>
+    +getCarDetailsWithImages(carId: int): Car
+    +searchCars(criteria: SearchCriteria): list<Car>
+    +getCarAverageReview(carId: int): CarRatingSummary
+    +insertCar(car: Car): int
+    +insertCarImage(carId: int, imageUrl: string): void
+  }
+
+  class ReviewRepository {
+    +pdo: PDO
+    +getCarReviews(carId: int): list<Review>
+    +hasUserReviewedCar(userId: int, carId: int): bool
+    +giveReview(userId: int, carId: int, stars: int, topic: string, description: string): void
+    +editReview(reviewId: int, userId: int, stars: int, topic: string, description: string): void
+    +deleteReview(reviewId: int, userId: int): void
+    +addReviewLike(reviewId: int, userId: int): void
+    +removeReviewLike(reviewId: int, userId: int): void
+    +countReviewLikes(reviewIds: list<int>): map<int,int>
+    +findLikedReviewIdsByUser(userId: int, reviewIds: list<int>): set<int>
+  }
+
+  class CommunityRepository {
+    +pdo: PDO
+    +addPost(userId: int, topic: string, content: string): void
+    +updatePost(postId: int, userId: int, topic: string, content: string): void
+    +deletePostByOwner(postId: int, userId: int): void
+    +deletePostAsAdmin(postId: int): void
+    +togglePostLike(postId: int, userId: int, isLike: bool): void
+    +addComment(postId: int, userId: int, commentText: string): void
+    +getPostsFull(userId: int): list<Post>
+    +getCommentsByPostIds(postIds: list<int>): map<int,list<Comment>>
+  }
+
+  class SessionRepository {
+    +sessionUserKey: string
+    +sessionTokenKey: string
+    +sessionLastActivityKey: string
+    +start(user: User, token: string): SessionState
+    +getCurrent(): SessionState
+    +refresh(lastActivityAt: datetime): void
+    +destroy(): void
+  }
+
+  class FileStorageGateway {
+    +basePath: string
+    +createDirectory(path: string): void
+    +moveUploadedFile(tempPath: string, targetPath: string): bool
+  }
+}
+
+' ============================
+' Inheritance / realization
+' ============================
+AdminUser --|> User
+
+' ============================
+' Domain cardinalities
+' ============================
+User "1" -- "0..*" SessionState : owns sessions
+User "1" -- "0..*" Review : writes
+Car "1" -- "0..*" Review : receives
+Car "1" *-- "1..*" CarImage : contains
+Car "1" -- "0..1" CarRatingSummary : computed summary
+
+Review "1" -- "0..*" ReviewLike : has likes
+User "1" -- "0..*" ReviewLike : gives likes
+
+User "1" -- "0..*" Post : creates
+Post "1" -- "0..*" Comment : has
+User "1" -- "0..*" Comment : writes
+
+Post "1" -- "0..*" PostReaction : receives
+User "1" -- "0..*" PostReaction : gives
+
+SearchCriteria ..> Car : filters
+
+' ============================
+' Controller -> Service
+' ============================
+AuthController ..> AuthService
+AuthController ..> SessionService
+RegisterController ..> RegistrationService
+LogoutController ..> SessionService
+SessionGuardController ..> SessionService
+
+HomeController ..> HomeService
+SearchController ..> SearchService
+CarController ..> CarService
+CarController ..> ReviewService
+CommunityController ..> CommunityService
+ProfileController ..> ProfileService
+ProfileController ..> ImageStorageService
+AdminCarController ..> CarService
+ReviewUpdateController ..> ReviewService
+
+' ============================
+' Service -> Repository
+' ============================
+AuthService ..> UserRepository
+RegistrationService ..> UserRepository
+SessionService ..> SessionRepository
+
+HomeService ..> CarRepository
+HomeService ..> UserRepository
+SearchService ..> CarRepository
+CarService ..> CarRepository
+ReviewService ..> ReviewRepository
+CommunityService ..> CommunityRepository
+ProfileService ..> UserRepository
+ImageStorageService ..> FileStorageGateway
+
+' ============================
+' Repository -> Infrastructure
+' ============================
+UserRepository ..> DatabaseConnection
+CarRepository ..> DatabaseConnection
+ReviewRepository ..> DatabaseConnection
+CommunityRepository ..> DatabaseConnection
+SessionRepository ..> SessionState
+
+' ============================
+' Service -> Domain
+' ============================
+AuthService ..> User
+RegistrationService ..> User
+SessionService ..> SessionState
+HomeService ..> Car
+SearchService ..> SearchCriteria
+SearchService ..> Car
+CarService ..> Car
+CarService ..> CarImage
+CarService ..> CarRatingSummary
+ReviewService ..> Review
+ReviewService ..> ReviewLike
+CommunityService ..> Post
+CommunityService ..> Comment
+CommunityService ..> PostReaction
+ProfileService ..> User
+
+note right of DatabaseConnection
+Backed by `repositories/db_connect.php`.
+Creates PDO connection using host/port/db/user/pass.
+end note
+
+note right of SessionRepository
+Mapped to PHP native `$_SESSION` storage and
+session lifecycle in controllers/page_controller.php,
+controllers/login.php, controllers/logout.php.
+end note
+
+note bottom of CarRepository
+Stored procedure usage seen in project:
+- Get_Thumbnail
+- Get_Four_Other_Cars
+- GetCarDetailsWithImages
+- search_cars
+- GetCarAverageReview
+- InsertCar
+- InsertCarImage
+end note
+
+note bottom of ReviewRepository
+Stored procedure usage seen in project:
+- GiveReview
+- EditReview
+- DeleteReview
+- AddReviewLike
+- RemoveReviewLike
+- GetCarReviews
+plus SQL checks for duplicates and like counts.
+end note
+
+note bottom of CommunityRepository
+Stored procedure usage seen in project:
+- AddPost
+- TogglePostLike
+- AddComment
+- GetPostsFull
+plus direct SQL for update/delete and comment fetch.
+end note
+
+@enduml

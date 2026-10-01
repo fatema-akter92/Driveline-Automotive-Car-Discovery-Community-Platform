@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Use Case Diagram</title>
+  <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center; font-family:Arial;">
+
+<h2>Admin Use Case Diagram</h2>
+<img id="diagram">
+
+<script>
+const code = `
+@startuml
+left to right direction
+
+actor "Registered User" as User
+actor Admin
+Admin --|> User
+
+actor "MySQL Database Server" as DB
+
+rectangle "Driveline Web Application" {
+
+  (Add Car)
+  (Validate Car Form)
+  (Add Car Images)
+  (Delete Any Post)
+
+  Admin --> (Add Car)
+  (Add Car) ..> (Validate Car Form) : <<include>>
+  (Add Car Images) ..> (Add Car) : <<extend>>
+
+  Admin --> (Delete Any Post)
+
+  (Add Car) --> DB
+  (Add Car Images) --> DB
+  (Delete Any Post) --> DB
+}
+@enduml
+`;
+
+const encoded = plantumlEncoder.encode(code);
+document.getElementById("diagram").src =
+  "https://www.plantuml.com/plantuml/svg/" + encoded;
+</script>
+
+</body>
+</html>

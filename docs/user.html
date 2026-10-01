@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>User Use Case Diagram</title>
+  <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center; font-family:Arial;">
+
+<h2>Registered User Use Case Diagram</h2>
+<img id="diagram">
+
+<script>
+const code = `
+@startuml
+left to right direction
+
+actor "Registered User" as User
+actor "MySQL Database Server" as DB
+
+rectangle "Driveline Web Application" {
+
+  (View Homepage)
+  (Search Cars)
+  (Apply Filters)
+  (View Results)
+  (View Car Details)
+  (View Reviews)
+  (Write Review)
+  (Edit Review)
+  (Delete Review)
+  (Like/Unlike Review)
+  (Prevent Duplicate Review)
+  (View Community Feed)
+  (Create Post)
+  (Edit Post)
+  (Delete Post)
+  (React to Post)
+  (Comment on Post)
+  (View Profile)
+  (Edit Profile)
+
+  User --> (View Homepage)
+
+  User --> (Search Cars)
+  (Search Cars) ..> (Apply Filters) : <<include>>
+  (Search Cars) ..> (View Results) : <<include>>
+
+  User --> (View Car Details)
+  User --> (View Reviews)
+  User --> (Write Review)
+  User --> (Edit Review)
+  User --> (Delete Review)
+  User --> (Like/Unlike Review)
+
+  (Write Review) ..> (Prevent Duplicate Review) : <<include>>
+
+  User --> (View Community Feed)
+  User --> (Create Post)
+  User --> (Edit Post)
+  User --> (Delete Post)
+  User --> (React to Post)
+  User --> (Comment on Post)
+
+  User --> (View Profile)
+  User --> (Edit Profile)
+
+  (View Results) --> DB
+  (View Car Details) --> DB
+  (View Reviews) --> DB
+  (Write Review) --> DB
+  (Edit Review) --> DB
+  (Delete Review) --> DB
+  (Like/Unlike Review) --> DB
+  (View Community Feed) --> DB
+  (Create Post) --> DB
+  (Edit Post) --> DB
+  (Delete Post) --> DB
+  (React to Post) --> DB
+  (Comment on Post) --> DB
+  (View Profile) --> DB
+  (Edit Profile) --> DB
+}
+@enduml
+`;
+
+const encoded = plantumlEncoder.encode(code);
+document.getElementById("diagram").src =
+  "https://www.plantuml.com/plantuml/svg/" + encoded;
+</script>
+
+</body>
+</html>
