@@ -1,7 +1,6 @@
-# Driveline
 
+#  Driveline — Automotive Discovery & Community Platform
 
-# 🚗 Driveline — Automotive Discovery & Community Platform
 
 ![PHP](https://img.shields.io/badge/PHP-8.x-777BB4?style=for-the-badge&logo=php&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
@@ -9,9 +8,15 @@
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![Architecture](https://img.shields.io/badge/Architecture-MVC%20%2F%20Layered-orange?style=for-the-badge)
 
+
+-----------------
+
+
 **Driveline** is a modern, responsive web application engineered for car enthusiasts, buyers, and reviewers. Featuring smart search algorithms, detailed vehicle profiles, community-driven discussions, and comprehensive user review systems, Driveline streamlines the journey of discovering and evaluating automobiles.
 
----
+-----------
+
+
 
 ## 🌟 Key Features
 
@@ -26,8 +31,9 @@
 ---
 
 ## Tech Stack & Requirements
-Backend: PHP 7.4+ or 8.x
-Database: MySQL / MariaDB
-Frontend: Vanilla HTML5, CSS3, JavaScript
-Server: Apache (via XAMPP, WampServer, or PHP Built-in Server)
-Documentation: UML 2.0 (PlantUML / Mermaid / HTML docs)
+
+- Backend: PHP 7.4+ or 8.x
+- Database: MySQL / MariaDB
+- Frontend: Vanilla HTML5, CSS3, JavaScript
+- Server: Apache (via XAMPP, WampServer, or PHP Built-in Server)
+- Documentation: UML 2.0 (PlantUML / Mermaid / HTML docs)
