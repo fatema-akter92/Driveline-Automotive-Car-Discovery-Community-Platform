@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Activity - Car Review</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Activity Diagram - Car Review System</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+start
+:View Car Details;
+:View Reviews;
+
+if (Write Review?) then (yes)
+  :Enter Stars, Topic, Description;
+  :Check Duplicate;
+  :Submit Review if Allowed;
+endif
+
+if (Edit/Delete?) then (yes)
+  :Check Review Ownership;
+  :Edit or Delete if Allowed;
+  :Update DB;
+endif
+
+if (Like/Unlike?) then (yes)
+  :Toggle Like/Unlike;
+endif
+
+:Refresh Review Section;
+stop
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>

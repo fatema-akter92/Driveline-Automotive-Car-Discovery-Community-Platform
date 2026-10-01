@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Activity - Admin Community Control</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Activity Diagram - Admin Community Control</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+start
+:Admin Opens Feed;
+:Load All Posts;
+:View All Posts;
+:Select Post;
+
+if (Admin privileges confirmed?) then (yes)
+  if (Delete?) then (yes)
+    :Open Delete Confirmation;
+    if (Confirmed?) then (yes)
+      :Delete Post from DB;
+      :Refresh Feed;
+    else (no)
+      :Cancel Action;
+    endif
+  else (no)
+    :Return to Feed;
+  endif
+else (no)
+  :Reject Unauthorized Access;
+endif
+
+stop
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Activity - Homepage Access</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Activity Diagram - Homepage & Session</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+start
+:Request Homepage;
+:Verify Session;
+if (Session valid?) then (yes)
+  :Check Timeout;
+  if (Active?) then (yes)
+    :Load Featured Cars;
+    :Load Suggested Cars;
+    :Load Ratings;
+    :Check Admin Role;
+    if (Admin?) then (yes)
+      :Show Add Car Action;
+    else (no)
+      :Hide Add Car Action;
+    endif
+    :Display Homepage;
+
+    if (Navigate to module?) then (yes)
+      :Open Profile/Search/Community/Car Details;
+    else (no)
+      :Stay on Homepage;
+    endif
+  else (no)
+    :Destroy Session;
+    :Redirect to Login;
+  endif
+else (no)
+  :Redirect to Login;
+endif
+stop
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>

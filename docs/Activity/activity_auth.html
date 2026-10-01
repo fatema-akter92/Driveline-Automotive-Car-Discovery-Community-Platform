@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Activity - Authentication</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Activity Diagram - Authentication</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+!pragma useVerticalIf on
+start
+:Access Landing;
+:Select Authentication Action;
+
+if (Login selected?) then (yes)
+  :Enter Credentials;
+  if (Fields complete?) then (yes)
+    :Validate Credentials;
+    if (Valid?) then (yes)
+      :Create Session;
+      :Redirect to Homepage;
+    else (no)
+      :Show Login Error;
+    endif
+  else (no)
+    :Show Required Field Error;
+  endif
+endif
+
+if (Register selected?) then (yes)
+  :Enter Registration Data;
+  :Validate Input;
+  if (Input valid?) then (yes)
+    :Check Email Uniqueness;
+    if (Unique?) then (yes)
+      :Create Account;
+      :Redirect to Login;
+    else (no)
+      :Show Email Exists Error;
+    endif
+  else (no)
+    :Show Validation Errors;
+  endif
+endif
+stop
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>

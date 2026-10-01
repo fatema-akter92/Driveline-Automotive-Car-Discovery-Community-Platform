@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Activity - Community (User)</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Activity Diagram - Community (User)</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+start
+:Open Community Feed;
+:View Posts;
+
+if (Create Post?) then (yes)
+  :Write and Submit Post;
+  :Save Post + Refresh Feed;
+endif
+
+if (Edit/Delete Post?) then (yes)
+  :Check Ownership;
+  :Modify/Delete if Allowed;
+  :Update Feed;
+endif
+
+if (React?) then (yes)
+  :Toggle Like/Dislike;
+endif
+
+if (Comment?) then (yes)
+  :Write Comment;
+  :Save Comment;
+endif
+
+stop
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>

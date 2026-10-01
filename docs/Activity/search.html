@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Activity - Search Cars</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Activity Diagram - Search Cars</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+start
+:Open Search Page;
+:Enter Search Query;
+:Apply Filters;
+
+if (Any criteria provided?) then (yes)
+  :Normalize Input (trim/null values);
+  :Send Request;
+  :Fetch Results from DB;
+else (no)
+  :Load Default Search Results;
+endif
+
+if (Results found?) then (yes)
+  :Display Results;
+  if (Select a car?) then (yes)
+    :Open Car Details Page;
+  else (no)
+    :Stay on Results;
+  endif
+else (no)
+  :Show No Results Message;
+endif
+stop
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>
