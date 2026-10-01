@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sequence - Admin Community</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Sequence Diagram - Admin Community Control</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+actor Admin
+participant "Web App" as App
+database DB
+
+Admin -> App : Open Feed
+App -> DB : Fetch All Posts
+DB --> App : Posts
+App --> Admin : Display Feed
+
+Admin -> App : Select Post
+
+alt Delete Action
+  App -> App : Confirm Admin Privilege
+  App -> DB : Delete Post
+  DB --> App : Success
+  App --> Admin : Refresh Feed
+else Cancel
+  App --> Admin : No Change
+end
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>

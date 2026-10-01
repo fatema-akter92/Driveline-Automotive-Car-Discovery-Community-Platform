@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sequence - Search Cars</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Sequence Diagram - Search Cars</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+actor User
+participant "Web App" as App
+database DB
+
+User -> App : Enter Query + Filters
+
+alt Criteria Provided
+  App -> App : Normalize Input
+  App -> DB : Search Cars
+  DB --> App : Results
+
+  alt Results Found
+    App --> User : Show Results
+    User -> App : Select Car
+    App --> User : Open Car Details
+  else No Results
+    App --> User : Show No Results
+  end
+
+else No Criteria
+  App -> DB : Load Default Cars
+  DB --> App : Default Results
+  App --> User : Display Results
+end
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>

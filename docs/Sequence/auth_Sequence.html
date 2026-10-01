@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sequence - Authentication</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Sequence Diagram - Authentication</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+actor Guest
+participant "Web App" as App
+database DB
+participant "Session Engine" as Session
+
+Guest -> App : Submit Login/Register
+
+alt Login
+  App -> DB : Fetch User by Email
+  DB --> App : User Data
+
+  alt Valid User & Password
+    App -> Session : Create Session
+    Session --> App : Session Token
+    App --> Guest : Redirect to Homepage
+  else Invalid
+    App --> Guest : Show Error
+  end
+else Register
+  App -> DB : Check Email
+  DB --> App : Exists / Not Exists
+
+  alt Unique Email
+    App -> DB : Create User
+    App --> Guest : Success + Redirect
+  else Duplicate
+    App --> Guest : Show Error
+  end
+end
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>

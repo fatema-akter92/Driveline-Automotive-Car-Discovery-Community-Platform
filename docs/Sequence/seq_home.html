@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sequence - Homepage</title>
+<script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center;font-family:Arial;">
+<h2>Sequence Diagram - Homepage & Session</h2>
+<img id="d">
+<script>
+const code = `
+@startuml
+actor User
+participant "Web App" as App
+participant "Session Engine" as Session
+database DB
+
+User -> App : Request Homepage
+App -> Session : Verify Session
+
+alt Valid Session
+  App -> Session : Check Timeout
+
+  alt Active
+    App -> DB : Fetch Featured Cars
+    App -> DB : Fetch Suggested Cars
+    App -> DB : Fetch Ratings
+    DB --> App : Data
+    App --> User : Display Homepage
+  else Timeout
+    App -> Session : Destroy Session
+    App --> User : Redirect to Login
+  end
+
+else Invalid
+  App --> User : Redirect to Login
+end
+@enduml
+`;
+const e = plantumlEncoder.encode(code);
+document.getElementById("d").src="https://www.plantuml.com/plantuml/svg/"+e;
+</script>
+</body>
+</html>
