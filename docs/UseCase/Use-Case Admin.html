@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Use Case Diagram</title>
+  <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center; font-family:Arial;">
+
+<h2>Admin Use Case Diagram</h2>
+<img id="diagram">
+
+<script>
+const code = `
+@startuml
+left to right direction
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F7FBFF
+  BorderColor #1B4D7A
+}
+
+actor "Registered User" as User
+actor Admin
+Admin --|> User
+
+actor "MySQL Database Server" as DB
+actor "PHP Session Engine" as Session
+
+rectangle "Driveline Web Application" {
+
+  package "Admin Access" {
+    (Access Protected Page)
+    (Verify Session)
+    (Check Timeout)
+    (Check Admin Privileges)
+  }
+
+  package "Car Management" {
+    (Access Add Car Page)
+    (Add Car)
+    (Validate Car Form)
+    (Add Car Images)
+  }
+
+  package "Community Moderation" {
+    (View Community Feed)
+    (Delete Any Post)
+    (Confirm Deletion)
+  }
+
+  Admin --> (Access Protected Page)
+  (Access Protected Page) ..> (Verify Session) : <<include>>
+  (Access Protected Page) ..> (Check Timeout) : <<include>>
+  (Access Protected Page) ..> (Check Admin Privileges) : <<include>>
+
+  Admin --> (Access Add Car Page)
+  (Access Add Car Page) ..> (Check Admin Privileges) : <<include>>
+
+  Admin --> (Add Car)
+  (Add Car) ..> (Check Admin Privileges) : <<include>>
+  (Add Car) ..> (Validate Car Form) : <<include>>
+  (Add Car Images) ..> (Add Car) : <<extend>>
+
+  Admin --> (View Community Feed)
+  Admin --> (Delete Any Post)
+  (Delete Any Post) ..> (Confirm Deletion) : <<include>>
+  (Delete Any Post) ..> (View Community Feed) : <<extend>>
+
+  (Verify Session) --> Session
+  (Check Timeout) --> Session
+  (Check Admin Privileges) --> DB
+
+  (Add Car) --> DB
+  (Add Car Images) --> DB
+  (View Community Feed) --> DB
+  (Delete Any Post) --> DB
+}
+@enduml
+`;
+
+const encoded = plantumlEncoder.encode(code);
+document.getElementById("diagram").src =
+  "https://www.plantuml.com/plantuml/svg/" + encoded;
+</script>
+
+</body>
+</html>

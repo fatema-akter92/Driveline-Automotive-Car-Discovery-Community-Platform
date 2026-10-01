@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>User Use Case Diagram</title>
+  <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.min.js"></script>
+</head>
+<body style="text-align:center; font-family:Arial;">
+
+<h2>Registered User Use Case Diagram</h2>
+<img id="diagram">
+
+<script>
+const code = `
+@startuml
+left to right direction
+
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam nodesep 70
+skinparam ranksep 70
+
+skinparam usecase {
+  BackgroundColor #F7FBFF
+  BorderColor #1B4D7A
+}
+
+' ===== Actors =====
+actor "Registered User" as User
+
+' ===== External Systems (Right Side) =====
+actor "PHP Session Engine" as Session
+actor "MySQL Database Server" as DB
+
+User -[hidden]-> Session
+Session -[hidden]-> DB
+
+' ===== System Boundary =====
+rectangle "Driveline Web Application" {
+
+  ' ===== Core Access =====
+  package "Access Control" {
+    (Access Protected Page)
+    (Verify Session)
+    (Check Timeout)
+  }
+
+  ' ===== Main Features =====
+  package "Core Features" {
+    (View Homepage)
+    (Search Cars)
+    (View Car Details)
+  }
+
+  ' ===== Reviews =====
+  package "Review System" {
+    (View Reviews)
+    (Write Review)
+    (Edit/Delete Review)
+    (React to Review)
+  }
+
+  ' ===== Community =====
+  package "Community" {
+    (View Feed)
+    (Manage Post)
+    (React to Post)
+    (Comment on Post)
+  }
+
+  ' ===== Profile =====
+  package "Profile" {
+    (View Profile)
+    (Edit Profile)
+  }
+
+  ' ===== Abstraction Layer =====
+  package "System Services" {
+    (Data Access Layer)
+  }
+
+  ' ===== User Interactions =====
+  User --> (Access Protected Page)
+  (Access Protected Page) ..> (Verify Session) : <<include>>
+  (Access Protected Page) ..> (Check Timeout) : <<include>>
+
+  User --> (View Homepage)
+  User --> (Search Cars)
+  User --> (View Car Details)
+
+  User --> (View Reviews)
+  User --> (Write Review)
+  User --> (Edit/Delete Review)
+  User --> (React to Review)
+
+  User --> (View Feed)
+  User --> (Manage Post)
+  User --> (React to Post)
+  User --> (Comment on Post)
+
+  User --> (View Profile)
+  User --> (Edit Profile)
+
+  ' ===== Data Layer Connections (CLEAN) =====
+  (Search Cars) --> (Data Access Layer)
+  (View Car Details) --> (Data Access Layer)
+  (View Reviews) --> (Data Access Layer)
+  (Write Review) --> (Data Access Layer)
+  (Edit/Delete Review) --> (Data Access Layer)
+  (React to Review) --> (Data Access Layer)
+  (View Feed) --> (Data Access Layer)
+  (Manage Post) --> (Data Access Layer)
+  (React to Post) --> (Data Access Layer)
+  (Comment on Post) --> (Data Access Layer)
+  (View Profile) --> (Data Access Layer)
+  (Edit Profile) --> (Data Access Layer)
+
+}
+
+' ===== External Connections =====
+(Verify Session) --> Session
+(Check Timeout) --> Session
+(Data Access Layer) --> DB
+
+@enduml
+`;
+
+const encoded = plantumlEncoder.encode(code);
+document.getElementById("diagram").src =
+  "https://www.plantuml.com/plantuml/svg/" + encoded;
+</script>
+</body>
+</html>
